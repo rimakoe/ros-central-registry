@@ -205,3 +205,15 @@ cc_binary(
         ":example_cc_proto",
     ],
 )
+
+cc_binary(
+    name = "minimal_loader",
+    srcs = ["src/minimal_loader.cpp"],
+    data = ["@urdf//:ament_package"],
+    linkopts = ["-rdynamic"],
+    deps = [
+        "@class_loader//:class_loader_library",
+        "@urdf//:urdf_library",
+        "@urdf_parser_plugin//:urdf_parser_plugin_library",
+    ],
+)

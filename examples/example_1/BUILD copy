@@ -1,0 +1,86 @@
+load("@com_github_mvukov_rules_ros2//ros2:cc_defs.bzl", "ros2_cpp_binary", "ros2_cpp_library")
+load("@com_github_mvukov_rules_ros2//ros2:launch.bzl", "ros2_launch")
+load("@com_github_mvukov_rules_ros2//ros2:package.bzl", "ros2_package")
+load("@com_github_mvukov_rules_ros2//ros2:plugin.bzl", "ros2_plugin")
+load("@rules_python//python:defs.bzl", "py_binary")
+load("@rules_ros2_pip_deps//:requirements.bzl", "requirement")
+
+package = ros2_package("ros2_control_demo_example_1")
+
+ros2_plugin(
+    name = "rrbot_hardware_interface",
+    srcs = ["hardware/rrbot.cpp"],
+    hdrs = ["hardware/include/ros2_control_demo_example_1/rrbot.hpp"],
+    plugin_specs = [{
+        "class_name": "ros2_control_demo_example_1/RRBotSystemPositionOnlyHardware",
+        "class_type": "ros2_control_demo_example_1::RRBotSystemPositionOnlyHardware",
+        "base_class_type": "hardware_interface::SystemInterface",
+    }],
+    strip_include_prefix = "hardware/include",
+    deps = [
+        "@ros2_control//:controller_interface",
+        "@ros2_control//:controller_manager",
+        "@ros2_control//:hardware_interface",
+        "@ros2_pluginlib//:pluginlib",
+        "@ros2_rcl_interfaces//:cpp_lifecycle_msgs",
+        "@ros2_rclcpp//:rclcpp",
+        "@ros2_rclcpp//:rclcpp_lifecycle",
+        "@ros2_robot_state_publisher//:robot_state_publisher_node",
+    ],
+)
+
+package.cpp_library(
+    name = "example_1_lib",
+    srcs = [
+        "hardware/rrbot.cpp",
+    ],
+    hdrs = ["hardware/include/ros2_control_demo_example_1/rrbot.hpp"],
+    data = [
+        ":rrbot_hardware_interface",
+        "@ros2_controllers//:forward_command_controller",
+    ],
+    strip_include_prefix = "hardware/include",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@ros2_control//:controller_interface",
+        "@ros2_control//:controller_manager",
+        "@ros2_control//:hardware_interface",
+        "@ros2_pluginlib//:pluginlib",
+        "@ros2_rcl_interfaces//:cpp_lifecycle_msgs",
+        "@ros2_rclcpp//:rclcpp",
+        "@ros2_rclcpp//:rclcpp_lifecycle",
+        "@ros2_robot_state_publisher//:robot_state_publisher_node",
+        "@ros2_rosidl//:rosidl_typesupport_introspection_c",
+        "@ros2_rosidl//:rosidl_typesupport_introspection_c_identifier",
+        "@ros2_rosidl//:rosidl_typesupport_introspection_cpp",
+        "@ros2_rosidl//:rosidl_typesupport_introspection_cpp_identifier",
+    ],
+)
+
+package.launch(
+    name = "launch_example_1",
+    launch_file = "bringup/launch/rrbot.launch.py",
+    nodes = [
+        ":example_1_lib",
+        "@ros2_control//:ros2_control_node",
+        "@ros2_control//:spawner",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@ros2_ament_index//:ament_index_python",
+        "@ros2_rcl_interfaces//:py_rcl_interfaces",
+        "@ros2_rcl_interfaces//:py_composition_interfaces",
+        "@ros2_rclpy//:rclpy",
+        "@ros2_launch//:launch",
+        "@ros2_launch_ros//:launch_ros",
+        "@ros2_robot_state_publisher//:robot_state_publisher_node",
+        "@ros2_rpyutils//:rpyutils",
+        "@ros2cli//:ros2pkg",
+        "@osrf_pycommon",
+        requirement("pyyaml"),
+        requirement("packaging"),
+        #"@ros2_launch_ros//:ros2launch",
+    ],
+)
+
+package.create()
