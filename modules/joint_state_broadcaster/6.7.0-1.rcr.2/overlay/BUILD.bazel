@@ -1,0 +1,71 @@
+# Copyright 2026 Open Source Robotics Foundation, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+load("@generate_parameter_library//:defs.bzl", "generate_parameter_library")
+load("@rosdistro//ament:defs.bzl", "ament_package")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_shared_library")
+
+package(default_visibility = ["//visibility:public"])
+
+generate_parameter_library(
+    name = "joint_state_broadcaster_parameters",
+    yaml_file = "src/joint_state_broadcaster_parameters.yaml",
+)
+
+cc_library(
+    name = "joint_state_broadcaster_library",
+    srcs = [
+        "src/joint_state_broadcaster.cpp",
+    ],
+    hdrs = ["include/joint_state_broadcaster/joint_state_broadcaster.hpp"],
+    includes = ["include"],
+    deps = [
+        ":joint_state_broadcaster_parameters",
+        "@control_msgs//:cc",
+        "@controller_interface//:controller_interface_library",
+        "@rclcpp//:rclcpp_library",
+        "@rclcpp_lifecycle//:rclcpp_lifecycle_library",
+        "@realtime_tools//:realtime_tools_library",
+        "@sensor_msgs//:cc",
+        "@urdf//:urdf_library",
+    ],
+)
+
+cc_shared_library(
+    name = "joint_state_broadcaster",
+    exports_filter = [":joint_state_broadcaster_library"],
+    deps = [
+        ":joint_state_broadcaster_library",
+    ],
+)
+
+### PACKAGING
+
+ament_package(
+    name = "ament_package",
+    lib_data = [":joint_state_broadcaster"],
+    libraries = [":joint_state_broadcaster_library"],
+    package_xml = "package.xml",
+    plugin_category = "controller_interface",
+    plugins = ["joint_state_plugin.xml"],
+    deps = [
+        "@builtin_interfaces//:ament_package",
+        "@control_msgs//:ament_package",
+        "@pluginlib//:ament_package",
+        "@rclcpp//:ament_package",
+        "@realtime_tools//:ament_package",
+        "@sensor_msgs//:ament_package",
+        "@urdf//:ament_package",
+    ],
+)
