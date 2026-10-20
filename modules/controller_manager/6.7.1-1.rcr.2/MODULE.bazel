@@ -71,6 +71,9 @@ bazel_dep(name = "ros2pkg", version = "0.40.7-1.rcr.1")
 bazel_dep(name = "rosdistro", version = "lyrical.2026-06-08.rcr.9")
 bazel_dep(name = "sensor_msgs", version = "5.9.2-3.rcr.1")
 bazel_dep(name = "std_msgs", version = "5.9.2-3.rcr.1")
+bazel_dep(name = "libcap", version = "2.27.bcr.2")
+bazel_dep(name = "rclcpp_lifecycle", version = "32.0.0-1.rcr.1")
+bazel_dep(name = "urdf", version = "2.13.2-3.rcr.2")
 
 # Setup Python
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
